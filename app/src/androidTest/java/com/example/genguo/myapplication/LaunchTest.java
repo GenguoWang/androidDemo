@@ -8,12 +8,15 @@ import android.support.test.InstrumentationRegistry;
 import android.support.test.runner.AndroidJUnit4;
 import android.support.test.uiautomator.By;
 import android.support.test.uiautomator.UiDevice;
+import android.support.test.uiautomator.UiObject2;
 import android.support.test.uiautomator.Until;
 
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
+import static org.hamcrest.CoreMatchers.equalTo;
+import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.junit.Assert.assertThat;
 
@@ -44,6 +47,13 @@ public class LaunchTest {
     @Test
     public void checkPreCondition(){
         assertThat(mDevice, notNullValue());
+    }
+
+    @Test
+    public void gotoVolley(){
+        mDevice.findObject(By.res(MY_PACKAGE_NAME,"volleyBtn")).click();
+        UiObject2 object = mDevice.wait(Until.findObject(By.res(MY_PACKAGE_NAME, "volley_text")), 5000);
+        assertThat(object.getText(), is(equalTo("kingo")));
     }
 
     private String getLauncherPackageName(){

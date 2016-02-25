@@ -23,6 +23,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content" />
     <Button
+        android:id="@+id/volleyBtn"
         android:text="Volley"
         android:onClick="gotoVolleyActivity"
         android:layout_width="wrap_content"
