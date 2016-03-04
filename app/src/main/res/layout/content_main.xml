@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/main_content"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
@@ -26,6 +27,18 @@
         android:id="@+id/volleyBtn"
         android:text="Volley"
         android:onClick="gotoVolleyActivity"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content" />
+    <Button
+        android:id="@+id/delayedTransitionBtn"
+        android:text="delayedTransition"
+        android:onClick="testDelayedTransition"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content" />
+    <Button
+        android:id="@+id/testIntentService"
+        android:text="testIntentService"
+        android:onClick="testIntentService"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content" />
     <EditText

@@ -24,6 +24,7 @@
         </activity>
         <activity android:name=".volley.VolleyActivity">
         </activity>
+        <service android:name=".service.DemoIntentService" android:exported="false" />
     </application>
     <uses-permission android:name="android.permission.INTERNET"/>
 

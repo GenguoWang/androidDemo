@@ -1,24 +1,47 @@
 package com.example.genguo.myapplication;
 
+import android.annotation.TargetApi;
+import android.content.BroadcastReceiver;
+import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
+import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
+import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.transition.Fade;
+import android.transition.Transition;
+import android.transition.TransitionInflater;
+import android.transition.TransitionManager;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.ViewGroup;
+import android.widget.Button;
+import android.widget.EditText;
 
 import com.example.genguo.myapplication.activity.AnotherActivity;
 import com.example.genguo.myapplication.daggerTest.PrinterModule;
 import com.example.genguo.myapplication.daggerTest.WorkStation;
 import com.example.genguo.myapplication.recyclerView.RecyclerViewActivity;
+import com.example.genguo.myapplication.service.DemoIntentService;
 import com.example.genguo.myapplication.volley.VolleyActivity;
 
 import javax.inject.Singleton;
 
 import dagger.Component;
+
+class ResponseReceiver extends BroadcastReceiver{
+    @Override
+    public void onReceive(Context context, Intent intent) {
+        Log.d("wgg","response received: "+intent.getStringExtra(Constant.EXTENDED_DATA_STATUS));
+    }
+}
 
 public class MainActivity extends AppCompatActivity {
     @Singleton
@@ -27,12 +50,14 @@ public class MainActivity extends AppCompatActivity {
         WorkStation station();
     }
 
+    private EditText editText;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
+        editText = (EditText)findViewById(R.id.editText);
 
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {
@@ -43,7 +68,7 @@ public class MainActivity extends AppCompatActivity {
                             @Override
                             public void onClick(View v) {
                                 Intent intent = new Intent(MainActivity.this, AnotherActivity.class);
-                                intent.putExtra("text","I'm Miley, loves Kingo");
+                                intent.putExtra("text", "I'm Miley, loves Kingo");
                                 startActivity(intent);
                             }
                         }).show();
@@ -51,6 +76,9 @@ public class MainActivity extends AppCompatActivity {
         });
         WorkGetter workGetter = DaggerMainActivity_WorkGetter.builder().build();
         workGetter.station().work();
+        IntentFilter filter = new IntentFilter(Constant.BROADCAST_ACTION);
+        ResponseReceiver receiver = new ResponseReceiver();
+        LocalBroadcastManager.getInstance(this).registerReceiver(receiver,filter);
     }
 
     public void gotoRecyclerView(View v){
@@ -61,6 +89,41 @@ public class MainActivity extends AppCompatActivity {
     public void gotoVolleyActivity(View v){
         Intent intent = new Intent(MainActivity.this, VolleyActivity.class);
         startActivity(intent);
+    }
+
+    @TargetApi(Build.VERSION_CODES.KITKAT)
+    public void testDelayedTransition(View v){
+        ViewGroup rootView = (ViewGroup) findViewById(R.id.main_content);
+        TransitionManager.beginDelayedTransition(rootView, new Fade());
+        rootView.removeView(editText);
+        Button btn = new Button(this);
+        btn.setText("changeBack");
+        ViewGroup.LayoutParams param = new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+        btn.setLayoutParams(param);
+        btn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                MainActivity.this.testDelayedTransitionBack(null);
+            }
+        });
+        rootView.addView(btn);
+    }
+
+    @TargetApi(Build.VERSION_CODES.KITKAT)
+    public void testDelayedTransitionBack(View v){
+        ViewGroup rootView = (ViewGroup) findViewById(R.id.main_content);
+        TransitionManager.beginDelayedTransition(rootView, new Fade(Fade.IN));
+        rootView.addView(editText);
+    }
+
+    @TargetApi(Build.VERSION_CODES.KITKAT)
+    public void testSceneTransition(){
+        //todo
+        Transition mFadeTransition =
+                TransitionInflater.from(this).
+                        inflateTransition(R.transition.test_transition);
+        Transition fromCodeFadeTransition = new Fade();
+        //TransitionManager.go();
     }
 
     @Override
@@ -83,5 +146,11 @@ public class MainActivity extends AppCompatActivity {
         }
 
         return super.onOptionsItemSelected(item);
+    }
+
+    public void testIntentService(View v){
+        Intent intent = new Intent(this, DemoIntentService.class);
+        intent.setData(Uri.parse("http://www.baidu.com"));
+        startService(intent);
     }
 }
